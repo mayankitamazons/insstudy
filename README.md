@@ -1,104 +1,170 @@
 <br/>
 <div align="center">
-  <a href="https://github.com/ibnaleem/instatracker/releases">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/2048px-Instagram_logo_2016.svg.png" alt="Logo" width="20%" height="20%">
-  </a>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Instagram_logo_2016.svg/2048px-Instagram_logo_2016.svg.png" alt="Logo" width="20%" height="20%">
   
-  <h2 align="center">InstaTracker</h3>
+  <h2 align="center">Instagram Followers Exporter</h3>
 
   <p align="center">
-    📸 an Instagram tracker that logs any changes to an Instagram account (followers, following, posts, and bio)
+    📸 A tool to export Instagram followers data to JSON format
     <br />
     <br />
-    <a href="https://github.com/ibnaleem/instatracker/issues">Report Bugs</a>
   </p>
 </div>
 
 ---------------------------------------
 
-![proof of concept](https://github.com/ibnaleem/instatracker/blob/main/proof%20of%20concept/poc.png?raw=true)
+## Features
+
+- Export followers data for any public Instagram account
+- Supports JSON export with detailed follower information
+- Web-based authentication with session caching
+- Smart rate-limit handling with automatic retries
+- Command-line interface with various options
+
 ```
 python3 main.py -h
-usage: Instagram Tracker [-h] -u USERNAME
+usage: Instagram Followers Exporter [-h] -u USERNAME [-o OUTPUT] [--force-login]
+                                   [--max-retries MAX_RETRIES] [--version]
 
-📸 an Instagram tracker that logs any changes to an Instagram account
-(followers, following, posts, and bio)
+Export Instagram followers list to JSON
 
 options:
   -h, --help            show this help message and exit
   -u USERNAME, --username USERNAME
-                        The username of the account to track
-
-🤝 Contribute: https://github.com/ibnaleem/instatracker
+                        Instagram username to fetch followers from
+  -o OUTPUT, --output OUTPUT
+                        Output JSON filename (default: USERNAME_followers.json)
+  --force-login         Force a new login session, ignoring cached credentials
+  --max-retries MAX_RETRIES
+                        Maximum number of retries for rate-limited requests
+  --version             show program's version number and exit
 ```
+## Important Notes
+
 > [!IMPORTANT]
-> You must login to *your* Instagram account in order to properly scrape someone else's Instagram account. This is due to Instagram blocking `HTTPS GET` requests from unauthenticated cookies. Your login information is never stored. See more [here](https://github.com/ibnaleem/instatracker/blob/main/main.py#L51C1-L56C136) and [here](https://github.com/instaloader/instaloader/blob/master/instaloader/instaloadercontext.py#L253C1-L338C43).
+> You must login to *your* Instagram account in order to properly access follower data. This is due to Instagram blocking `HTTPS GET` requests from unauthenticated sessions. Your login credentials are not stored in plain text - the tool uses browser-based authentication and session caching.
+
+> [!CAUTION]
+> Instagram's Terms of Service restrict automated data collection. Use this tool responsibly and at your own risk. Excessive use may result in your account being temporarily restricted or blocked.
 
 > [!TIP]
-> You can always create/use an alt-account for the interative login.
-
+> Consider using a dedicated Instagram account for data collection rather than your personal account.
 
 ## Installation
+
 > [!TIP]
-> [Install Python if you don't have it already](https://www.python.org/downloads/)
-#### Clone this repository:
-```
-$ git clone https://github.com/ibnaleem/instatracker.git
-```
-#### Install dependencies:
-```
+> [Install Python 3.7+ if you don't have it already](https://www.python.org/downloads/)
+
+#### Install from this repository:
+
+```bash
+# Clone the repository (or download the ZIP file)
+$ git clone https://github.com/yourusername/instagram-followers-exporter.git
+$ cd instagram-followers-exporter
+
+# Install dependencies
 $ pip install -r requirements.txt
 ```
-#### Set `user` & `passwd` field on [line 71](https://github.com/ibnaleem/instatracker/blob/main/main.py#L71)
-```python
-self.bot.login(user="YOUR INSTAGRAM USERNAME", passwd="YOUR INSTAGRAM PASSWORD") # this allows us to access & scrape Instagram.
+
+## Usage
+
+```bash
+# Basic usage - export followers for an account
+$ python main.py -u instagram
+
+# Specify a custom output filename
+$ python main.py -u instagram -o custom_filename.json
+
+# Force a new login session (useful if you're having auth issues)
+$ python main.py -u instagram --force-login
+
+# Adjust retry attempts for rate limiting
+$ python main.py -u instagram --max-retries 5
 ```
-#### Run the script
+
+## Output Format
+
+The tool exports followers data to a JSON file with the following structure:
+
+```json
+{
+  "timestamp": "2023-07-15 12:34:56.789012",
+  "username": "instagram",
+  "followers_count": 123,
+  "followers": [
+    {
+      "username": "follower1",
+      "full_name": "Follower One",
+      "profile_pic_url": "https://...",
+      "is_private": false,
+      "is_verified": true
+    },
+    ...
+  ]
+}
 ```
-$ python3 main.py -u USERNAME
-```
-## Automated Logging
-InstaTracker not only displays all modifications an Instagram account makes directly to the terminal (e.g., *USERNAME has unfollowed 1 person*), but it also records these changes in a text file, including the date and time.
-```
-------2024-06-30 01:01:13.659694+00:00------
-johndoe has 100
-johndoe is following 100 people
-johndoe has 0 posts
-johndoe has the following bio: this is my biography
-------2024-06-31 02:03:15.761715+00:00------
-johndoe has lost 2 followers (100 followers --> 98 followers)
-------2024-06-31 05:03:15.761715+00:00------
-johndoe has gained 5 followers (98 followers --> 103 followers)
-...
-```
-This script checks for any changes every 5 minutes because Instagram's firewall starts blocking requests that are sent too quickly. You can manually update this [here](https://github.com/ibnaleem/instatracker/blob/main/main.py#L70), but do not be surprised if the script stops working.
+
+## Handling Rate Limits
+
+Instagram strictly rate-limits API access. This tool implements several strategies to work within these limits:
+
+1. Progressive delays between requests
+2. Exponential backoff for retry attempts 
+3. Session testing to detect authentication issues
+4. Detailed error messages with guidance
+
+If you encounter rate limiting issues:
+- Wait at least 30 minutes before trying again
+- Try using a different network connection or VPN
+- Use a different Instagram account for authentication
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### Login Problems
+- If login fails, try using `--force-login` to clear cached sessions
+- Make sure to complete all verification steps in the browser window
+- For private accounts, you must be following the account to access their data
+
+#### 401 Unauthorized Errors
+- This usually indicates Instagram rate limiting
+- Wait at least 30 minutes before trying again
+- Consider using a different network connection
+
+#### Incomplete Data
+- For accounts with large follower counts, Instagram may not return complete data
+- The script implements progressive delays to avoid triggering rate limits
+- Try collecting data during off-peak hours
 
 ## Built With
-- [Python](https://www.python.org/)
-- [Instaloader](https://github.com/instaloader/instaloader)
-- [Rich](https://github.com/Textualize/rich)
-## LICENSE
-This repository is under the [MIT License](https://github.com/ibnaleem/instatracker/blob/main/LICENSE)
-## Created By
-[Ibn Aleem](https://www.linkedin.com/in/shaffan-aleem-b7a852255/)
+- [Python](https://www.python.org/) - Programming language
+- [Instaloader](https://github.com/instaloader/instaloader) - Instagram scraping library
+- [Rich](https://github.com/Textualize/rich) - Terminal formatting library
+
+## License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Contributing
-I welcome contributions from the community and appreciate the time and effort put into making [InstaTracker](https://github.com/ibnaleem/InstaTracker) better. To contribute, please follow the guidelines and steps outlined below:
 
-> Note: **_Your pull request will be closed if you do not specify the changes you've made._**
+Contributions to improve the tool are welcome! Here are some ways you can contribute:
 
-### Fork the Repository
-Start by [forking this repository](https://github.com/ibnaleem/InstaTracker/fork). You can do this by clicking on the ["Fork"](https://github.com/ibnaleem/InstaTracker/fork) button located at the top right corner of the GitHub page. This will create a personal copy of the repository under your own GitHub account.
+- Report bugs and issues
+- Add new features or improve existing ones
+- Improve documentation
+- Suggest optimizations for handling Instagram's rate limiting
 
-### Clone the Repository
-Next, clone the forked repository to your local machine using the following command:
-```bash
-$ git clone https://github.com/yourusername/instatracker.git
-```
-Navigate to the cloned directory:
-```bash 
-$ cd instatracker
-```
+Please follow these steps to contribute:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Disclaimer
+
+This tool is provided for educational purposes only. Use it responsibly and in accordance with Instagram's Terms of Service. The developers are not responsible for any misuse of this tool or for any restrictions applied to your Instagram account as a result of using this tool.
 ### Create a New Branch
 Before making any changes, it's recommended to create a new branch. This ensures that your changes won't interfere with other contributions and keeps the main branch clean. Use the following command to create and switch to a new branch:
 ```bash
