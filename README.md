@@ -42,13 +42,13 @@ options:
 ## Important Notes
 
 > [!IMPORTANT]
-> You must login to *your* Instagram account in order to properly access follower data. This is due to Instagram blocking `HTTPS GET` requests from unauthenticated sessions. Your login credentials are not stored in plain text - the tool uses browser-based authentication and session caching.
+> You must login to *your* Instagram account in order to properly access follower data. This is due to Instagram blocking `HTTPS GET` requests from unauthenticated sessions. This tool uses browser-based authentication only - you must be logged into Instagram in your browser.
 
 > [!CAUTION]
-> Instagram's Terms of Service restrict automated data collection. Use this tool responsibly and at your own risk. Excessive use may result in your account being temporarily restricted or blocked.
+> Instagram's Terms of Service restrict automated data collection. Use this tool responsibly and respect Instagram's policies. This tool is for educational purposes only.
 
 > [!TIP]
-> Consider using a dedicated Instagram account for data collection rather than your personal account.
+> Always respect rate limits and pause between requests to avoid temporary restrictions.
 
 ## Installation
 
@@ -115,8 +115,8 @@ Instagram strictly rate-limits API access. This tool implements several strategi
 
 If you encounter rate limiting issues:
 - Wait at least 30 minutes before trying again
-- Try using a different network connection or VPN
-- Use a different Instagram account for authentication
+- Try using a different network connection
+- Make sure you're properly logged into Instagram in your browser
 
 ## Troubleshooting
 
